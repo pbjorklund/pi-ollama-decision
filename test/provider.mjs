@@ -21,7 +21,7 @@ async function load(t, response) {
     return response(url, options);
   });
   const registrations = [];
-  await extension({ registerProvider: (...args) => registrations.push(args) });
+  await extension({ registerProvider: (...args) => registrations.push(args), registerTool() {} });
   return { calls, registrations };
 }
 
@@ -105,7 +105,7 @@ test("Pi runtime exposes the classifier and resolves its dummy key without crede
     assert.ok(String(url).startsWith(origin));
     return catalog()(String(url));
   });
-  await extension({ registerProvider: (...args) => runtime.registerProvider(...args) });
+  await extension({ registerProvider: (...args) => runtime.registerProvider(...args), registerTool() {} });
   const available = await runtime.getAvailableOfType("classifier", "ollama-decision");
   assert.equal(available.length, 1);
   assert.equal(available[0].id, "nimble:latest");
