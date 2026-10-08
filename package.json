@@ -1,0 +1,22 @@
+{
+  "name": "pi-ollama-decision",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal Pi classifier provider for the local Ollama Nimble service.",
+  "pi": { "extensions": ["./pi-extension.ts"] },
+  "scripts": {
+    "test": "node --test test/*.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-ai": "1.0.4",
+    "@earendil-works/pi-coding-agent": "1.0.4",
+    "typescript": "~5.9.3"
+  },
+  "repository": { "type": "git", "url": "git+ssh://git@github.com/pbjorklund/pi-ollama-decision.git" }
+}
