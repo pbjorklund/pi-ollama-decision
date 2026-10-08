@@ -1,4 +1,4 @@
-import { classify } from "@earendil-works/pi-ai/api/typesafe-system-one";
+import { builtinProviders } from "@earendil-works/pi-ai/providers/all";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 const origin = "http://127.0.0.1:11435";
@@ -43,6 +43,8 @@ async function discoverNimble(): Promise<{ id: string; contextWindow: number } |
 export default async function (pi: ExtensionAPI) {
   const model = await discoverNimble();
   if (!model) return;
+  const classify = builtinProviders().find((provider) => provider.id === "typesafe")?.classify;
+  if (!classify) throw new Error("Pi does not expose the TypeSafe classifier adapter");
   pi.registerProvider("ollama-decision", {
     baseUrl: `${origin}/v1`,
     apiKey: "ollama",

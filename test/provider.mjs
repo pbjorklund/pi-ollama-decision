@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, rm, copyFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { ModelRuntime } from "@earendil-works/pi-coding-agent";
@@ -27,6 +28,23 @@ async function load(t, response) {
 function catalog(metadata = show, listing = tags) {
   return (url) => Response.json(url.endsWith("/api/tags") ? listing : metadata);
 }
+
+test("installed Pi loads the extension without a local dependency tree", async (t) => {
+  const dir = await mkdtemp(join(tmpdir(), "pi-ollama-load-"));
+  t.after(() => rm(dir, { recursive: true, force: true }));
+  const entry = join(dir, "pi-extension.ts");
+  await copyFile(new URL("../pi-extension.ts", import.meta.url), entry);
+  const result = spawnSync("pi", [
+    "-ne", "-nc", "--offline", "--no-mcp", "--no-session",
+    "-e", entry, "--mode", "rpc",
+  ], {
+    cwd: dir, input: "", encoding: "utf8", timeout: 20000,
+    env: { ...process.env, PI_CODING_AGENT_DIR: dir, PI_TELEMETRY: "0" },
+  });
+  assert.equal(result.error, undefined);
+  assert.equal(result.status, 0, result.stderr);
+  assert.doesNotMatch(result.stderr, /Failed to load extension/);
+});
 
 test("registers only the local Nimble classifier with capped context", async (t) => {
   const { calls, registrations } = await load(t, catalog());
