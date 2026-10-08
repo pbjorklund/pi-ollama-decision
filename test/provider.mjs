@@ -28,7 +28,7 @@ function catalog(metadata = show, listing = tags) {
   return (url) => Response.json(url.endsWith("/api/tags") ? listing : metadata);
 }
 
-test("registers only the local Nimble classifier with discovered context", async (t) => {
+test("registers only the local Nimble classifier with capped context", async (t) => {
   const { calls, registrations } = await load(t, catalog());
   assert.equal(registrations.length, 1);
   const [provider, config] = registrations[0];
@@ -38,7 +38,7 @@ test("registers only the local Nimble classifier with discovered context", async
   assert.deepEqual(config.models, [{
     type: "classifier", id: "nimble:latest", name: "Nimble (local Ollama)",
     api: "typesafe-system-one", baseUrl: `${origin}/v1`, input: ["text"],
-    contextWindow: 32768, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+    contextWindow: 8192, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
   }]);
   assert.equal(typeof config.classifiers["typesafe-system-one"].classify, "function");
   assert.deepEqual(calls.map((c) => c.url), [`${origin}/api/tags`, `${origin}/api/show`]);
@@ -46,6 +46,17 @@ test("registers only the local Nimble classifier with discovered context", async
   assert.ok(calls.every((c) => c.options.signal instanceof AbortSignal));
   assert.ok(calls.every((c) => c.options.redirect === "error"));
 });
+
+for (const contextWindow of [4096, 8192, 262144]) {
+  test(`advertises the smaller of model context ${contextWindow} and service context 8192`, async (t) => {
+    const metadata = {
+      capabilities: ["decision"],
+      model_info: { "general.architecture": "qwen35", "qwen35.context_length": contextWindow },
+    };
+    const { registrations } = await load(t, catalog(metadata));
+    assert.equal(registrations[0][1].models[0].contextWindow, Math.min(contextWindow, 8192));
+  });
+}
 
 for (const [name, response] of [
   ["absent service", () => { throw new TypeError("fetch failed"); }],

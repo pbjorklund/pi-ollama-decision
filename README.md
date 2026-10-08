@@ -12,7 +12,7 @@ The repo is private, so Git must have access to `pbjorklund/pi-ollama-decision`.
 
 The separate desktop Ollama service must support `/v1/systemone` and have `nimble` installed. [Ollama's decision docs](https://github.com/ollama/ollama/blob/main/docs/capabilities/decision.mdx) require Ollama 0.35.0 or later for Nimble. This extension does not install, start, or pull anything.
 
-On startup, the extension checks `/api/tags` for `nimble` or `nimble:latest`, then `/api/show` for the `decision` capability and the architecture's context length. Discovery has a 1.5-second total timeout. A missing service, model, or usable metadata skips registration without an extension error. Thinkpad and dev VM installs can keep the package enabled without running the service. Start a new Pi session or run `/reload` after starting the service or pulling Nimble.
+On startup, the extension checks `/api/tags` for `nimble` or `nimble:latest`, then `/api/show` for the `decision` capability and the architecture's context length. The advertised context window is the smaller of that model maximum and 8192 tokens, matching the separate desktop service's configured context. Discovery has a 1.5-second total timeout. A missing service, model, or usable metadata skips registration without an extension error. Thinkpad and dev VM installs can keep the package enabled without running the service. Start a new Pi session or run `/reload` after starting the service or pulling Nimble.
 
 ## Use
 

@@ -34,7 +34,7 @@ async function discoverNimble(): Promise<{ id: string; contextWindow: number } |
     if (typeof architecture !== "string") return;
     const contextWindow = show.model_info[`${architecture}.context_length`];
     if (typeof contextWindow !== "number" || !Number.isSafeInteger(contextWindow) || contextWindow <= 0) return;
-    return { id, contextWindow };
+    return { id, contextWindow: Math.min(contextWindow, 8192) };
   } catch {
     return;
   }
