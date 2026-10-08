@@ -40,7 +40,7 @@ If the service stops after startup, classifier calls return Pi's normal error re
 
 ## Check
 
-Use Node 22.18 or later (native TypeScript stripping):
+Use Node 22.18 or later (native TypeScript stripping) and an installed `pi` binary:
 
 ```sh
 npm ci --ignore-scripts
@@ -48,4 +48,4 @@ npm test
 npm run typecheck
 ```
 
-Tests use synthetic state and mocked local HTTP responses. They cover discovery, quiet absence, Pi runtime registration and key resolution, choice/bool/score conversion, usage, HTTP failures, malformed answers, and cancellation. They do not call a cloud provider or require a running Ollama service.
+Tests use synthetic state and mocked local HTTP responses. They cover discovery, quiet absence, Pi runtime registration and key resolution, choice/bool/score conversion, usage, HTTP failures, malformed answers, and cancellation. Binary regression tests copy the package outside the checkout without `node_modules`, disable Jiti caches, and use isolated Pi RPC settings to check startup and classification with the bundled adapter. They do not call a cloud provider or require a running Ollama service.
